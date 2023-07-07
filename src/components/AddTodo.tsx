@@ -8,9 +8,12 @@ export function AddTodo() {
 
     function handleFormSubmit(e: FormEvent) {
         e.preventDefault()
+        
         dispatch(add({
             newTodo
         }))
+
+        setNewTodo("")
     }
 
     return (

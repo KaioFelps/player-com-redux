@@ -4,16 +4,26 @@ import { Video } from "../components/Video";
 import { Module } from "../components/Module";
 import { useAppSelector } from "../store";
 import { useEffect } from "react";
-import { useCurrentClassAndModule } from "../store/slices/player";
+import { start, useCurrentClassAndModule } from "../store/slices/player";
+import { useDispatch } from "react-redux";
+import { api } from "../lib/axios";
 
 export function Player() {
-    const modules = useAppSelector(state => state.player.course.modules)
+    const dispatch = useDispatch()
+
+    const modules = useAppSelector(state => state.player.course?.modules)
 
     const { currentClass } = useCurrentClassAndModule()
 
     useEffect(() => {
-        document.title = `Redux Class: ${currentClass.title}`
-    })
+        api.get("/courses/1").then(res => {
+            dispatch(start(res.data))
+        })
+    }, [])
+
+    useEffect(() => {
+        if( currentClass ) document.title = `Redux Class: ${currentClass?.title}`
+    }, [currentClass])
 
     return (
         <div className="h-screen bg-zinc-950 text-zinc-50 flex justify-center items-center">
@@ -35,7 +45,7 @@ export function Player() {
                     <aside className="
                     w-80 absolute top-0 bottom-0 right-0 border-l border-zinc-800 bg-zinc-900 overflow-y-scroll scrollbar-thin scrollbar-track-zinc-950 scrollbar-thumb-zinc-800 divide-y divide-zinc-900
                     ">
-                        {modules.map((module, index) => {
+                        {modules && modules.map((module, index) => {
                             return (
                                 <Module
                                     key={module.id}

@@ -1,11 +1,12 @@
-import { player as reducer, play, next } from "./player"
+import { player as reducer, play, next, PlayerState } from "./player"
 import { describe, test, expect } from "vitest"
 
-const exampleInitialState = {
+const exampleInitialState: PlayerState = {
     course: {
+        id: 1,
         modules: [
           {
-            id: '1',
+            id: 1,
             title: 'Iniciando com React',
             classes: [
               { id: 'MNR0egvK_oQ', title: 'CSS Modules', duration: '13:45' },
@@ -13,7 +14,7 @@ const exampleInitialState = {
             ],
           },
           {
-            id: '2',
+            id: 2,
             title: 'Estrutura da aplicação',
             classes: [
               { id: 'gE48FQXRZ_o', title: 'Componente: Comment', duration: '13:45' },

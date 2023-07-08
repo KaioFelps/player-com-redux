@@ -1,5 +1,6 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { useAppSelector } from "..";
+import { api } from "../../lib/axios";
 
 interface Course {
   id: number
@@ -26,14 +27,30 @@ const initialState: PlayerState = {
   currentClassIndex: 0,
 }
 
+/*
+* redux thunk
+* é uma forma de ter uma action assíncrona, pois o redux não perimte colocarmos um async dentro de um simples action do redux
+* então, thunk é apenas uma forma de termos uma action assíncrona
+*
+* para disparar um thunk, precisa usar o useAppDispatch (criado no index.ts que cria a store)
+* isso acontece pois o thunk não é nativo do redux e usa uma biblioteca antiga do redux (redux thunk)
+*/
+export const loadCourse = createAsyncThunk(
+  // nome da action. É exatamente assim que aparecerá no redux devtool, pois ele não herda o nome do slice automáticamente como as actions do reducer
+  // ao invés de "prepor", ele "sufixa" com o estado da requisição (player/load/[pending, fulfilled, failure])
+  "player/load",
+
+  // o retorno dessa função é o que irá chegar para o fullfilled em seu payload
+  async () => {
+      const res = await api.get("/courses/1")
+      return res.data
+  }
+)
+
 export const playerSlice = createSlice({
     name: "player",
     initialState,
     reducers: {
-      start: (state, action: PayloadAction<Course>) => {
-        state.course = action.payload
-      },
-
       play: (state, action: PayloadAction<[number, number]>) => {
         state.currentModuleIndex = action.payload[0]
         state.currentClassIndex = action.payload[1]
@@ -57,11 +74,21 @@ export const playerSlice = createSlice({
         }
         
       }
+    },
+    /*
+     * é uma forma de fazer com que um reducer do redux ouça disparos de ações de outros locais (outros slices ou os async thunks)
+     */
+    extraReducers(builder) {
+      // addCase = adicionar caso (se)
+      // se houver o loadCourse.fullfilled (indica sucesso), quando este acontecer, será disparado o reducer do lado
+      builder.addCase(loadCourse.fulfilled, (state, action) => {
+        state.course = action.payload
+      })
     }
 })
 
 export const player = playerSlice.reducer
-export const { play, next, start } = playerSlice.actions
+export const { play, next } = playerSlice.actions
 
 export const useCurrentClassAndModule = () => {
   return useAppSelector((state) => {

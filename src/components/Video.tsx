@@ -1,13 +1,22 @@
 import ReactPlayer from "react-player";
+import { useAppSelector } from "../store";
 
 export function Video() {
+    const currentClass = useAppSelector(state => {
+        const { currentClassIndex, currentModuleIndex } = state.player
+
+        const currentClass = state.player.course.modules[currentModuleIndex].classes[currentClassIndex]
+
+        return currentClass
+    })
+
     return (
         <div className="w-full bg-zinc-950 aspect-video pr-80">
             <ReactPlayer
             width="100%"
             height="100%"
             controls
-            url="https://www.youtube.com/watch?v=MNR0egvK_oQ"
+            url={`https://www.youtube.com/watch?v=${currentClass.id}`}
             />
         </div>
     )

@@ -38,7 +38,22 @@ const playerSlice = createSlice({
         state.currentClassIndex = action.payload[1]
       },
       next: (state) => {
+        const nextClassIndex = state.currentClassIndex + 1
+        const nextClass = state.course.modules[state.currentModuleIndex].classes[nextClassIndex]
 
+        if (nextClass) {
+          state.currentClassIndex = nextClassIndex
+          return;
+        }
+
+        const nextModuleIndex = state.currentModuleIndex + 1
+        const nextModule = state.course.modules[nextModuleIndex]
+
+        if(nextModule) {
+          state.currentModuleIndex = nextModuleIndex
+          state.currentClassIndex = 0
+        }
+        
       }
     }
 })

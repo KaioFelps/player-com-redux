@@ -19,12 +19,14 @@ export interface PlayerState {
   course: Course | null
   currentModuleIndex: number
   currentClassIndex: number
+  isLoading: boolean
 }
 
 const initialState: PlayerState = {
   course: null,
   currentModuleIndex: 0,
   currentClassIndex: 0,
+  isLoading: true,
 }
 
 /*
@@ -37,7 +39,7 @@ const initialState: PlayerState = {
 */
 export const loadCourse = createAsyncThunk(
   // nome da action. É exatamente assim que aparecerá no redux devtool, pois ele não herda o nome do slice automáticamente como as actions do reducer
-  // ao invés de "prepor", ele "sufixa" com o estado da requisição (player/load/[pending, fulfilled, failure])
+  // ao invés de "prepor", ele "sufixa" com o estado da requisição (player/load/[pending, fulfilled, rejected])
   "player/load",
 
   // o retorno dessa função é o que irá chegar para o fullfilled em seu payload
@@ -83,6 +85,11 @@ export const playerSlice = createSlice({
       // se houver o loadCourse.fullfilled (indica sucesso), quando este acontecer, será disparado o reducer do lado
       builder.addCase(loadCourse.fulfilled, (state, action) => {
         state.course = action.payload
+        state.isLoading = false
+      })
+
+      builder.addCase(loadCourse.pending, (state) => {
+        state.isLoading = true
       })
     }
 })

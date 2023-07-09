@@ -5,6 +5,7 @@ import { Module } from "../components/Module";
 import { useAppDispatch, useAppSelector } from "../store";
 import { useEffect } from "react";
 import { loadCourse, useCurrentClassAndModule } from "../store/slices/player";
+import { ModuleSkeleton } from "../components/ModuleSkeleton";
 
 export function Player() {
     const dispatch = useAppDispatch()
@@ -12,6 +13,7 @@ export function Player() {
     const modules = useAppSelector(state => state.player.course?.modules)
 
     const { currentClass } = useCurrentClassAndModule()
+    const courseIsLoading = useAppSelector(state => state.player.isLoading)
 
     useEffect(() => {
         dispatch(loadCourse())
@@ -41,7 +43,14 @@ export function Player() {
                     <aside className="
                     w-80 absolute top-0 bottom-0 right-0 border-l border-zinc-800 bg-zinc-900 overflow-y-scroll scrollbar-thin scrollbar-track-zinc-950 scrollbar-thumb-zinc-800 divide-y divide-zinc-900
                     ">
-                        {modules && modules.map((module, index) => {
+                        {courseIsLoading && 
+                            <div>
+                                <ModuleSkeleton amountOfModules={3} />
+                                <ModuleSkeleton />
+                            </div>
+                        }
+
+                        {(modules && !courseIsLoading) && modules.map((module, index) => {
                             return (
                                 <Module
                                     key={module.id}
